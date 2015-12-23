@@ -92,17 +92,17 @@ public class MainActivityFragment extends Fragment {
         GridView gridView = (GridView) rootView.findViewById(R.id.main_movie_grid);
         gridView.setAdapter(mMoviePosterAdapter);
 
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-////            @Override
-////            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-////                Movie details = movies.get(position);
-////                Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
-////                        .putExtra("movies_details", details);
-////                startActivity(intent);
-////            }
-//
-//        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Movie details = movies.get(position);
+                Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
+                        .putExtra("movies_details", details);
+                startActivity(intent);
+            }
+
+        });
 
         return rootView;
 

@@ -12,8 +12,13 @@ import android.os.Parcelable;
  */
 public class Movie implements Parcelable {
     String movieTitle;
+
+
+
     String movieDescription;
     String posterPath; // drawable reference id
+    private String releaseDate;
+
     private String voteAverage;
 
     public Movie(String movieTitle, String movieDescription, String posterPath, String voteAverage, String releaseDate) {
@@ -24,20 +29,27 @@ public class Movie implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
-    private String releaseDate;
+    public String getMovieDescription() {
+        return movieDescription;
+    }
 
     public String getMovieTitle() {
         return movieTitle;
     }
 
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+    public String getVoteAverage() {
+        return voteAverage;
+    }
+    public String getPoster() {
+        return posterPath;
+    }
 
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    public String getPoster() {
-        return posterPath;
     }
 
     @Override
@@ -67,4 +79,6 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+
 }

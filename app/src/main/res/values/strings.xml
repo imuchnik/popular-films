@@ -9,4 +9,8 @@
     <string name="sort_array_highly_rated">Highest-rated</string>
     <string name="sort_array_popularity_desc">popularity.desc</string>
     <string name="sort_array_vote_average">vote_average.desc</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="activity_details">Movie Details</string>
 </resources>

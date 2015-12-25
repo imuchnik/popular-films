@@ -1,15 +1,21 @@
 package imuchnik.android.com.nanoproject1;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -53,8 +59,10 @@ public class MainActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sortOrder = prefs.getString(getString(R.string.display_preferences_sort_order_key),
-                getString(R.string.display_preferences_sort_default_value));
+        if (prefs.getAll().size() == 0) {
+            setSortPreferences(getString(R.string.sort_default));
+        }
+        sortOrder = getPrefs();
 
         if (savedInstanceState != null) {
             ArrayList<Movie> storedMovies = new ArrayList<Movie>();
@@ -65,18 +73,24 @@ public class MainActivityFragment extends Fragment {
     }
 
 
-
     @Override
     public void onStart() {
         super.onStart();
 
-        if (movies.size() > 0) {
+        String prefSortOrder = getPrefs();
+
+        if (movies.size() > 0 && prefSortOrder.equals(sortOrder)) {
             updatePosterAdapter();
         } else {
-
+            sortOrder = prefSortOrder;
             getMovies();
         }
 
+    }
+
+    private String getPrefs() {
+        return prefs.getString(getString(R.string.display_preferences_sort_order_key),
+                getString(R.string.sort_default));
     }
 
     @Override
@@ -117,8 +131,10 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void getMovies() {
-        FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
-        fetchMoviesTask.execute();
+
+            FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
+            fetchMoviesTask.execute(sortOrder);
+
     }
 
     private void updatePosterAdapter() {
@@ -128,12 +144,58 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.popularity) {
+            item.setChecked(true);
+            setSortPreferences(getString(R.string.sort_popularity_desc));
+            sortOrder = getPrefs();
+            movies.clear();
+            getMovies();
+            return true;
+        }
+        if (id == R.id.rating) {
+            item.setChecked(true);
+            setSortPreferences(getString(R.string.sort_vote_average_desc));
+            sortOrder = getPrefs();
+            movies.clear();
+            getMovies();
+            return true;
+        }
+        movies.clear();
+        getMovies();
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setSortPreferences(String newSortValue) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("sortType", newSortValue);
+        editor.commit();
+    }
+
+    public boolean isOnline(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
+    }
+
+
     public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
 
         private final String MOVIE_POSTER_BASE = "http://image.tmdb.org/t/p/";
         private final String MOVIE_POSTER_SIZE = "w185";
-
-
+        final String SORT_BY = "sort_by";
 
 
         private List getMoviesFromJson(String movies)
@@ -159,7 +221,8 @@ public class MainActivityFragment extends Fragment {
 
 
         }
-        private String getYear(String date){
+
+        private String getYear(String date) {
             final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             final Calendar cal = Calendar.getInstance();
             try {
@@ -174,13 +237,21 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected List<Movie> doInBackground(String... params) {
+            if (params.length == 0) {
+                return null;
+            }
+
+
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String movies = "";
+            String sortBy = params[0];
 
             try {
                 final String base_url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=0d378ca9435b53e5795155172180b8e2";
-                Uri builtUri = Uri.parse(base_url).buildUpon().build();
+                Uri builtUri = Uri.parse(base_url).buildUpon()
+                        .appendQueryParameter(SORT_BY, sortBy)
+                        .build();
 
                 URL url = new URL(builtUri.toString());
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -212,8 +283,7 @@ public class MainActivityFragment extends Fragment {
                 }
             } catch (IOException e) {
                 Log.e("foo", "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
+
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -246,11 +316,6 @@ public class MainActivityFragment extends Fragment {
         }
 
     }
-
-
-//    JSONArray
-//    JSONObject
-//API request http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=0d378ca9435b53e5795155172180b8e2
 
 }
 

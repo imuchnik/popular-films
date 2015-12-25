@@ -9,17 +9,17 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -139,6 +139,7 @@ public class MainActivityFragment extends Fragment {
 
     private void updatePosterAdapter() {
         mMoviePosterAdapter.clear();
+
         for (Movie movie : movies) {
             mMoviePosterAdapter.add(movie.getPoster());
         }
@@ -179,6 +180,15 @@ public class MainActivityFragment extends Fragment {
         editor.commit();
     }
 
+    private void makeToast(String msg, Context  context){
+        //Context context = getActivity();
+
+        int duration = Toast.LENGTH_LONG;
+
+        Toast toast = Toast.makeText(context, msg, duration);
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.show();
+    }
     public boolean isOnline(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -248,16 +258,20 @@ public class MainActivityFragment extends Fragment {
             String sortBy = params[0];
 
             try {
-                final String base_url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=0d378ca9435b53e5795155172180b8e2";
+                String API_KEY = "{YOUR_API_KEY}";
+                final String base_url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" + API_KEY;
                 Uri builtUri = Uri.parse(base_url).buildUpon()
                         .appendQueryParameter(SORT_BY, sortBy)
                         .build();
-
-                URL url = new URL(builtUri.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
+                if (isOnline(getContext())) {
+                    URL url = new URL(builtUri.toString());
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+                }
+                else{
+                  return  null;
+                }
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
@@ -282,7 +296,7 @@ public class MainActivityFragment extends Fragment {
                     movies = buffer.toString();
                 }
             } catch (IOException e) {
-                Log.e("foo", "Error ", e);
+                makeToast("Something went wrong", getContext());
 
                 return null;
             } finally {
@@ -293,7 +307,7 @@ public class MainActivityFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("feh", "Error closing stream", e);
+                        makeToast("Something went wrong, closing connection", getContext());;
                     }
                 }
             }
@@ -311,8 +325,13 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List result) {
-            movies.addAll(result);
-            updatePosterAdapter();
+            if(result!=null) {
+                movies.addAll(result);
+                updatePosterAdapter();
+            }
+            else{
+                makeToast("No movies found, check internet connection", getContext());
+            }
         }
 
     }

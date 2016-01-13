@@ -35,3 +35,8 @@ proguard/
 # Log Files
 *.log
 
+.idea
+.idea/
+popular-films.iml
+app/app.iml
+app/app.iml

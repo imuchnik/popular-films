@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <group android:checkableBehavior="single">
         <item android:id="@+id/popularity"
+            android:checked="true"
             android:title="@string/sort_most_popular" />
         <item android:id="@+id/rating"
             android:title="@string/sort_array_highly_rated" />

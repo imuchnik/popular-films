@@ -258,7 +258,7 @@ public class MainActivityFragment extends Fragment {
             String sortBy = params[0];
 
             try {
-                String API_KEY = "{YOUR_API_KEY}";
+                String API_KEY = "0d378ca9435b53e5795155172180b8e2";
                 final String base_url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" + API_KEY;
                 Uri builtUri = Uri.parse(base_url).buildUpon()
                         .appendQueryParameter(SORT_BY, sortBy)
@@ -296,8 +296,9 @@ public class MainActivityFragment extends Fragment {
                     movies = buffer.toString();
                 }
             } catch (IOException e) {
-                makeToast("Something went wrong", getContext());
-
+                //makeToast("Something went wrong", getContext());
+                Log.e("closed connection", e.getMessage(), e);
+                e.printStackTrace();
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -307,7 +308,9 @@ public class MainActivityFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        makeToast("Something went wrong, closing connection", getContext());;
+                      //  makeToast("Something went wrong, closing connection", getContext());
+                        Log.e("closed connection", e.getMessage(), e);
+                        e.printStackTrace();
                     }
                 }
             }

@@ -168,6 +168,14 @@ public class MainActivityFragment extends Fragment {
             getMovies();
             return true;
         }
+        if (id == R.id.faves) {
+            item.setChecked(true);
+            setSortPreferences(getString(R.string.sort_vote_average_desc));
+            sortOrder = getPrefs();
+            movies.clear();
+            getMovies();
+            return true;
+        }
         movies.clear();
         getMovies();
 

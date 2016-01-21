@@ -7,5 +7,7 @@
             android:title="@string/sort_most_popular" />
         <item android:id="@+id/rating"
             android:title="@string/sort_array_highly_rated" />
+        <item android:id="@+id/faves"
+            android:title="@string/faves" />
     </group>
 </menu>

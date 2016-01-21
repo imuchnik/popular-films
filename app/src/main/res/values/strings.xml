@@ -6,6 +6,7 @@
     <string name="display_preferences_sort_order_key">sortType</string>
     <string name="sort_most_popular">Most Popular</string>
     <string name="sort_array_highly_rated">Highest-rated</string>
+    <string name="faves">Favorite</string>
     <string name="sort_popularity_desc">popularity.desc</string>
     <string name="sort_default">popularity.desc</string>
     <string name="sort_vote_average_desc">vote_average.desc</string>
@@ -14,4 +15,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="activity_details">Movie Details</string>
     <string name="sort_pref">Sort by</string>
+    <string name="watch_trailer">Watch Trailers</string>
 </resources>
